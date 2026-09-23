@@ -111,12 +111,37 @@ export const ServicesProvider = ({ children }) => {
     };
   };
 
+  const addPastService = (serviceData, pastDate) => {
+    const serviceDate = new Date(pastDate).toISOString();
+    const newService = {
+      id: Date.now().toString(),
+      status: 'FINALIZADO',
+      client: serviceData.client,
+      vehicle: serviceData.vehicle,
+      serviceDetails: serviceData.serviceDetails,
+      totalPrice: serviceData.totalPrice,
+      timestamps: { 
+        start: serviceDate, 
+        end: serviceDate 
+      },
+      nextReminderDate: calculateReminder(serviceData.serviceDetails.nivelDetalhe, serviceDate).toISOString(),
+      photos: { 
+        before: serviceData.photos?.before || [], 
+        after: serviceData.photos?.after || [], 
+        main: '' 
+      }
+    };
+    
+    setServices(prev => [newService, ...prev]);
+  };
+
   return (
     <ServicesContext.Provider value={{
       services,
       startService,
       finishService,
       updateService,
+      addPastService,
       getActiveServices,
       getFinishedServices,
       getReminders,

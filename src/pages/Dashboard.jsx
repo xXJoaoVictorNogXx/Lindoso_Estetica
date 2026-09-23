@@ -32,13 +32,22 @@ export function Dashboard() {
   };
 
   return (
-    <div className="p-4 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-24">
-      <header className="py-4">
-        <h1 className="text-2xl font-bold tracking-tight text-white">Dashboard</h1>
-        <p className="text-sm text-zinc-400">Resumo do seu negócio hoje</p>
+    <div className="p-4 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-24 w-full">
+      <header className="py-4 flex justify-between items-start">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-white">Dashboard</h1>
+          <p className="text-sm text-zinc-400">Resumo do seu negócio hoje</p>
+        </div>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="text-xs border-zinc-800 text-zinc-300 hover:text-white"
+          onClick={() => window.location.href = '/past-service'}
+        >
+          + Lavagem Antiga
+        </Button>
       </header>
 
-      {/* Resumo Financeiro */}
       <section className="grid grid-cols-2 gap-4">
         <Card className="bg-gradient-to-br from-indigo-500/10 to-zinc-900 border-indigo-500/20">
           <CardHeader className="p-4 pb-2">
@@ -65,7 +74,6 @@ export function Dashboard() {
         </Card>
       </section>
 
-      {/* SERVIÇOS EM ANDAMENTO */}
       {activeServices.length > 0 && (
         <section className="space-y-4">
           <h2 className="text-lg font-semibold text-white flex items-center gap-2">
@@ -94,7 +102,6 @@ export function Dashboard() {
         </section>
       )}
 
-      {/* Lembretes do Dia */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-white">Lembretes de Retorno</h2>
@@ -143,7 +150,6 @@ export function Dashboard() {
         </div>
       </section>
 
-      {/* MODAL DE FINALIZAR SERVIÇO */}
       {finishingService && (
         <div className="fixed inset-0 z-[100] flex items-end justify-center bg-zinc-950/80 backdrop-blur-sm animate-in fade-in">
           <div className="w-full max-w-md bg-zinc-900 border-t border-zinc-800 rounded-t-2xl shadow-2xl animate-in slide-in-from-bottom-full duration-300 pb-safe">

@@ -1,16 +1,14 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { Droplets, Mail, Lock, LogIn } from "lucide-react";
-
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 export function Login({ onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Simulate login for now. The real DB logic (Firebase/Supabase) will go here.
     if (email && password) {
       onLogin();
     }
@@ -18,7 +16,6 @@ export function Login({ onLogin }) {
 
   return (
     <div className="min-h-screen bg-zinc-950 flex flex-col justify-center p-4 relative overflow-hidden">
-      {/* Background Effects */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-md pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-72 h-72 bg-indigo-500/20 rounded-full blur-[100px]" />
         <div className="absolute bottom-[-10%] right-[-10%] w-72 h-72 bg-emerald-500/10 rounded-full blur-[100px]" />
