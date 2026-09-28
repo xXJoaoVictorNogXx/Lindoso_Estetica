@@ -116,12 +116,15 @@ export function Report() {
 
           <div className="bg-gray-100 rounded-lg overflow-hidden border border-gray-200 flex items-center justify-center">
              {photos.after.length > 0 ? (
-               <div className="w-full h-64 bg-gray-200 flex items-center justify-center text-gray-400">
-                  {/* Substituir por <img src={photos.after[0]} /> no app real */}
-                  [Foto Principal]
+               <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                  <img src={photos.after[0]} alt="Foto Principal (Depois)" className="object-cover w-full h-full" />
+               </div>
+             ) : photos.before.length > 0 ? (
+               <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                  <img src={photos.before[0]} alt="Foto Principal (Antes)" className="object-cover w-full h-full" />
                </div>
              ) : (
-               <div className="text-gray-400">Sem foto do veículo</div>
+               <div className="text-gray-400 h-64 flex items-center justify-center">Sem foto do veículo</div>
              )}
           </div>
         </div>
@@ -192,28 +195,44 @@ export function Report() {
         </div>
 
         {/* REGISTROS FOTOGRÁFICOS */}
-        <div className="bg-zinc-800 text-white p-3 mb-4 rounded" style={{ pageBreakBefore: 'auto' }}>
-          <h2 className="text-xl font-bold m-0">Registros</h2>
-        </div>
-        
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <h3 className="font-bold mb-2">Antes</h3>
-            <div className="grid grid-cols-1 gap-2">
-              <div className="h-48 bg-gray-200 rounded flex items-center justify-center text-gray-400">
-                [Foto Antes]
+        {(photos.before.length > 0 || photos.after.length > 0) && (
+          <>
+            <div className="bg-zinc-800 text-white p-3 mb-4 rounded" style={{ pageBreakBefore: 'auto' }}>
+              <h2 className="text-xl font-bold m-0">Registros</h2>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <h3 className="font-bold mb-2">Antes</h3>
+                <div className="grid grid-cols-1 gap-2">
+                  {photos.before.length > 0 ? photos.before.map((p, idx) => (
+                    <div key={idx} className="h-48 bg-gray-200 rounded overflow-hidden flex items-center justify-center">
+                      <img src={p} alt={`Antes ${idx}`} className="object-cover w-full h-full" />
+                    </div>
+                  )) : (
+                    <div className="h-48 bg-gray-200 rounded flex items-center justify-center text-gray-400 text-sm">
+                      Sem registros
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div>
+                <h3 className="font-bold mb-2">Depois</h3>
+                <div className="grid grid-cols-1 gap-2">
+                  {photos.after.length > 0 ? photos.after.map((p, idx) => (
+                    <div key={idx} className="h-48 bg-gray-200 rounded overflow-hidden flex items-center justify-center">
+                      <img src={p} alt={`Depois ${idx}`} className="object-cover w-full h-full" />
+                    </div>
+                  )) : (
+                    <div className="h-48 bg-gray-200 rounded flex items-center justify-center text-gray-400 text-sm">
+                      Sem registros
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-          <div>
-            <h3 className="font-bold mb-2">Depois</h3>
-            <div className="grid grid-cols-1 gap-2">
-              <div className="h-48 bg-gray-200 rounded flex items-center justify-center text-gray-400">
-                [Foto Depois]
-              </div>
-            </div>
-          </div>
-        </div>
+          </>
+        )}
         
         <div className="text-center mt-12 pt-8 border-t border-gray-200 text-gray-500 text-sm">
           Obrigado por confiar seus cuidados à Lindoso Estética Automotiva!
