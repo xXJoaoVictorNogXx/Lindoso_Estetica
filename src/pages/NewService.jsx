@@ -1,10 +1,10 @@
 import { useState, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useServices } from "../context/ServicesContext";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { Card, CardContent } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Input, Label } from "../components/ui/input";
-import { Camera, CheckCircle2 } from "lucide-react";
+import { Camera, CheckCircle2, UserPlus, Users } from "lucide-react";
 import { formatCurrency } from "../lib/utils";
 
 const EXTRAS_LIST = [
@@ -16,13 +16,18 @@ const EXTRAS_LIST = [
 ];
 
 export function NewService() {
-  const { startService } = useServices();
+  const { startService, clients, addClient } = useServices();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+  const clientPhotoRef = useRef(null);
+
+  const [isNewClient, setIsNewClient] = useState(true);
+  const [selectedClientId, setSelectedClientId] = useState("");
 
   const [formData, setFormData] = useState({
     clientName: "",
     phone: "",
+    document: "", // CPF
     brand: "",
     carModel: "",
     color: "",
@@ -39,7 +44,7 @@ export function NewService() {
   const [photos, setPhotos] = useState({
     before: []
   });
-
+  const [clientPhoto, setClientPhoto] = useState(""); // Foto do carro/cliente para registro
   const [success, setSuccess] = useState(false);
 
   const totalPrice = useMemo(() => {
@@ -47,21 +52,62 @@ export function NewService() {
     return Number(formData.basePrice) + extrasTotal;
   }, [formData.basePrice, selectedExtras]);
 
+  const handleClientSelection = (clientId) => {
+    setSelectedClientId(clientId);
+    const client = clients.find(c => c.id === clientId);
+    if (client) {
+      setFormData(prev => ({
+        ...prev,
+        clientName: client.name,
+        phone: client.phone,
+        document: client.document || "",
+        brand: client.vehicle?.brand || "",
+        carModel: client.vehicle?.model || "",
+        color: client.vehicle?.color || "",
+        plate: client.vehicle?.plate || "",
+        category: client.vehicle?.category || "Hatch",
+      }));
+      if (client.photo) {
+        setClientPhoto(client.photo);
+      } else {
+        setClientPhoto("");
+      }
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     
+    const vehicleData = {
+      brand: formData.brand,
+      model: formData.carModel,
+      color: formData.color,
+      plate: formData.plate,
+      category: formData.category
+    };
+
+    let clientToSave = null;
+    
+    if (isNewClient) {
+      clientToSave = addClient({
+        name: formData.clientName,
+        phone: formData.phone,
+        document: formData.document,
+        vehicle: vehicleData,
+        photo: clientPhoto
+      });
+    } else {
+      clientToSave = clients.find(c => c.id === selectedClientId);
+    }
+    
     startService({
       client: {
+        id: clientToSave?.id,
         name: formData.clientName,
-        phone: formData.phone
+        phone: formData.phone,
+        document: formData.document
       },
-      vehicle: {
-        brand: formData.brand,
-        model: formData.carModel,
-        color: formData.color,
-        plate: formData.plate,
-        category: formData.category
-      },
+      vehicle: vehicleData,
       serviceDetails: {
         diagnostico: formData.diagnostico,
         tipoLavagem: formData.tipoLavagem,
@@ -105,6 +151,13 @@ export function NewService() {
     }));
   };
 
+  const handleClientPhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setClientPhoto(URL.createObjectURL(file));
+    }
+  };
+
   if (success) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[80vh] space-y-4 animate-in zoom-in duration-300">
@@ -124,6 +177,21 @@ export function NewService() {
         <p className="text-sm text-muted-foreground">Registre a entrada do veículo</p>
       </header>
 
+      <div className="flex bg-muted p-1 rounded-lg">
+        <button 
+          onClick={() => { setIsNewClient(false); setClientPhoto(""); }} 
+          className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-md transition-colors ${!isNewClient ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+        >
+          <Users className="w-4 h-4" /> Existente
+        </button>
+        <button 
+          onClick={() => { setIsNewClient(true); setSelectedClientId(""); setClientPhoto(""); setFormData(prev => ({ ...prev, clientName: "", phone: "", document: "", brand: "", carModel: "", color: "", plate: "" })) }} 
+          className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-md transition-colors ${isNewClient ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+        >
+          <UserPlus className="w-4 h-4" /> Novo
+        </button>
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-8">
         
         {/* DADOS DO CLIENTE */}
@@ -131,13 +199,62 @@ export function NewService() {
           <h2 className="text-xs uppercase font-bold tracking-wider text-primary px-1">Dados do Cliente</h2>
           <Card className="border-border bg-card shadow-sm">
             <CardContent className="p-4 space-y-4">
+              {!isNewClient && (
+                <div className="space-y-2 mb-4 pb-4 border-b border-border">
+                  <Label htmlFor="clientSelect" className="text-card-foreground">Selecionar Cliente</Label>
+                  <select 
+                    id="clientSelect" 
+                    required 
+                    value={selectedClientId} 
+                    onChange={(e) => handleClientSelection(e.target.value)}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  >
+                    <option value="" disabled>Escolha um cliente...</option>
+                    {clients.map(c => (
+                      <option key={c.id} value={c.id}>{c.name} ({c.vehicle?.plate || 'Sem placa'})</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {clientPhoto && !isNewClient && (
+                <div className="flex justify-center mb-4">
+                  <div className="w-24 h-24 rounded-full border-4 border-background shadow-md overflow-hidden bg-muted">
+                    <img src={clientPhoto} alt="Perfil do cliente" className="w-full h-full object-cover" />
+                  </div>
+                </div>
+              )}
+
+              {isNewClient && (
+                <div className="flex flex-col items-center justify-center mb-6">
+                  <Label className="text-card-foreground mb-2 text-xs">Foto do Cliente/Carro (Opcional)</Label>
+                  <div 
+                    onClick={() => clientPhotoRef.current?.click()}
+                    className="w-24 h-24 rounded-full border-2 border-dashed border-primary hover:bg-muted cursor-pointer flex items-center justify-center overflow-hidden transition-colors"
+                  >
+                    {clientPhoto ? (
+                      <img src={clientPhoto} alt="Foto Cliente" className="w-full h-full object-cover" />
+                    ) : (
+                      <Camera className="w-8 h-8 text-primary opacity-50" />
+                    )}
+                  </div>
+                  <input type="file" accept="image/*" capture="environment" className="hidden" ref={clientPhotoRef} onChange={handleClientPhotoChange} />
+                </div>
+              )}
+
               <div className="space-y-2">
                 <Label htmlFor="clientName" className="text-card-foreground">Nome do Cliente</Label>
-                <Input id="clientName" name="clientName" required value={formData.clientName} onChange={handleChange} className="bg-background" />
+                <Input id="clientName" name="clientName" required value={formData.clientName} onChange={handleChange} className="bg-background" disabled={!isNewClient && selectedClientId !== ""} />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone" className="text-card-foreground">Telefone (WhatsApp)</Label>
-                <Input id="phone" name="phone" type="tel" required value={formData.phone} onChange={handleChange} className="bg-background" />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="phone" className="text-card-foreground">WhatsApp</Label>
+                  <Input id="phone" name="phone" type="tel" required value={formData.phone} onChange={handleChange} className="bg-background" disabled={!isNewClient && selectedClientId !== ""} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="document" className="text-card-foreground">CPF</Label>
+                  <Input id="document" name="document" placeholder="000.000.000-00" value={formData.document} onChange={handleChange} className="bg-background" disabled={!isNewClient && selectedClientId !== ""} />
+                </div>
               </div>
             </CardContent>
           </Card>

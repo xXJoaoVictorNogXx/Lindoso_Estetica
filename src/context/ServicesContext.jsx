@@ -11,9 +11,18 @@ export const ServicesProvider = ({ children }) => {
     return saved ? JSON.parse(saved) : [];
   });
 
+  const [clients, setClients] = useState(() => {
+    const saved = localStorage.getItem('@LindosoEstetica:clients');
+    return saved ? JSON.parse(saved) : [];
+  });
+
   useEffect(() => {
     localStorage.setItem('@LindosoEstetica:servicesV2', JSON.stringify(services));
   }, [services]);
+
+  useEffect(() => {
+    localStorage.setItem('@LindosoEstetica:clients', JSON.stringify(clients));
+  }, [clients]);
 
   const calculateReminder = (serviceType, date) => {
     const baseDate = new Date(date);
@@ -135,9 +144,23 @@ export const ServicesProvider = ({ children }) => {
     setServices(prev => [newService, ...prev]);
   };
 
+  const addClient = (clientData) => {
+    const newClient = {
+      id: Date.now().toString(),
+      name: clientData.name,
+      phone: clientData.phone,
+      document: clientData.document || '', // CPF
+      vehicle: clientData.vehicle, // Default vehicle
+      photo: clientData.photo || '' // Client/Car photo
+    };
+    setClients(prev => [newClient, ...prev]);
+    return newClient;
+  };
+
   return (
     <ServicesContext.Provider value={{
       services,
+      clients,
       startService,
       finishService,
       updateService,
@@ -145,7 +168,8 @@ export const ServicesProvider = ({ children }) => {
       getActiveServices,
       getFinishedServices,
       getReminders,
-      getFinancialSummary
+      getFinancialSummary,
+      addClient
     }}>
       {children}
     </ServicesContext.Provider>
