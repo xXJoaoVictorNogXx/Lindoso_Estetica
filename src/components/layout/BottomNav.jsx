@@ -11,7 +11,7 @@ export function BottomNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 flex h-16 items-center justify-around border-t border-zinc-800 bg-zinc-950/80 backdrop-blur-md pb-safe">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 flex h-16 items-center justify-around border-t border-border bg-background/80 backdrop-blur-md pb-safe transition-colors duration-300">
       {navItems.map((item) => (
         <NavLink
           key={item.path}
@@ -19,7 +19,7 @@ export function BottomNav() {
           className={({ isActive }) =>
             cn(
               "flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors",
-              isActive ? "text-indigo-500" : "text-zinc-500 hover:text-zinc-300"
+              isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
             )
           }
         >

@@ -21,6 +21,11 @@ function App() {
     } else {
       document.documentElement.classList.add('dark');
     }
+
+    const savedColorValue = localStorage.getItem('accentColorValue');
+    if (savedColorValue) {
+      document.documentElement.style.setProperty('--primary', savedColorValue);
+    }
   }, []);
 
   if (!isAuthenticated) {

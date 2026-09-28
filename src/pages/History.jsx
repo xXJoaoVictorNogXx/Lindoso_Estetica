@@ -23,15 +23,15 @@ export function History() {
   return (
     <div className="p-4 space-y-6 min-h-screen pb-24">
       <header className="py-2">
-        <h1 className="text-2xl font-bold tracking-tight text-white">Histórico</h1>
-        <p className="text-sm text-zinc-400">Todos os serviços finalizados</p>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">Histórico</h1>
+        <p className="text-sm text-muted-foreground">Todos os serviços finalizados</p>
       </header>
 
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input 
           placeholder="Buscar por placa ou nome..." 
-          className="pl-9 bg-zinc-900 border-zinc-800"
+          className="pl-9 bg-background border-border text-foreground"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
@@ -39,43 +39,43 @@ export function History() {
 
       <div className="space-y-3">
         {filteredServices.length === 0 ? (
-          <div className="text-center py-10 text-zinc-500">
+          <div className="text-center py-10 text-muted-foreground">
             Nenhum serviço encontrado.
           </div>
         ) : (
           filteredServices.map(service => (
             <Card 
               key={service.id} 
-              className="hover:bg-zinc-800/50 transition-colors"
+              className="hover:bg-muted/50 transition-colors bg-card border-border shadow-sm"
             >
               <CardContent className="p-4">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="font-medium text-white">{service.client.name}</h3>
-                    <div className="text-xs text-zinc-400 mt-1 space-x-2">
+                    <h3 className="font-medium text-card-foreground">{service.client.name}</h3>
+                    <div className="text-xs text-muted-foreground mt-1 space-x-2">
                       <span>{service.vehicle.model}</span>
                       <span>•</span>
                       <span className="uppercase">{service.vehicle.plate}</span>
                     </div>
-                    <div className="text-xs text-indigo-400 font-medium mt-2">
+                    <div className="text-xs text-primary font-medium mt-2">
                       {service.serviceDetails.tipoLavagem}
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-2">
-                    <span className="text-sm font-bold text-white">
+                    <span className="text-sm font-bold text-card-foreground">
                       {formatCurrency(service.totalPrice)}
                     </span>
-                    <span className="text-[10px] text-zinc-500">
+                    <span className="text-[10px] text-muted-foreground">
                       {formatDate(service.timestamps.end)}
                     </span>
                   </div>
                 </div>
 
-                <div className="mt-4 pt-4 border-t border-zinc-800 flex justify-end">
+                <div className="mt-4 pt-4 border-t border-border flex justify-end">
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="gap-2 text-xs"
+                    className="gap-2 text-xs text-muted-foreground hover:text-foreground border-border"
                     onClick={() => navigate(`/report/${service.id}`)}
                   >
                     <FileText className="w-4 h-4" />
